@@ -44,7 +44,7 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
             val job = cs.launch {
                 withContext(Dispatchers.Main) {
                     project.messageBus.syncPublisher(SearchListener.TOPIC)
-                        .searchStateChanged(SearchState.Running(previousResults))
+                        .searchStateChanged(SearchState.Running(searchPrompt, previousResults))
                 }
 
                 val objective = project.service<ObjectiveService>().objective
@@ -64,12 +64,12 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
                             lastResults = response.results
                             withContext(Dispatchers.Main) {
                                 project.messageBus.syncPublisher(SearchListener.TOPIC)
-                                    .searchStateChanged(SearchState.Results(response.results))
+                                    .searchStateChanged(SearchState.Results(searchPrompt, response.results))
                             }
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
                                 project.messageBus.syncPublisher(SearchListener.TOPIC)
-                                    .searchStateChanged(SearchState.Error("Invalid JSON: ${e.message}", previousResults))
+                                    .searchStateChanged(SearchState.Error(searchPrompt, "Invalid JSON: ${e.message}", previousResults))
                                 showError("Search failed: Invalid response from bridge: ${e.message}")
                             }
                         }
@@ -77,7 +77,7 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
                     is BridgeResult.Error -> {
                         withContext(Dispatchers.Main) {
                             project.messageBus.syncPublisher(SearchListener.TOPIC)
-                                .searchStateChanged(SearchState.Error(result.message, previousResults))
+                                .searchStateChanged(SearchState.Error(searchPrompt, result.message, previousResults))
                             showError("Search failed: ${result.message}")
                         }
                     }
