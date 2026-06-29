@@ -7,12 +7,17 @@ import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.impl.EditorEmbeddedComponentManager
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.rd.createLifetime
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import de.juschmitt.compass.search.ui.SearchNoteRenderer
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.awt.FlowLayout
 import java.awt.Font
 import javax.swing.JButton
@@ -21,36 +26,65 @@ import javax.swing.JPanel
 @Service(Service.Level.PROJECT)
 class SearchAnnotationService(private val project: Project) : Disposable {
 
-    // EDT-only — SearchService always publishes on Dispatchers.Main
+    private val searchResultState: MutableStateFlow<List<SearchResult>> = MutableStateFlow(emptyList())
     private val inlays: MutableList<Inlay<*>> = mutableListOf()
     private val connection = project.messageBus.connect(this)
 
     init {
+        this.createLifetime().coroutineScope.launch {
+            searchResultState.collect { results ->
+                if (results.isEmpty()) {
+                    clearAll()
+                } else {
+                    install(results)
+                }
+            }
+        }
         connection.subscribe(SearchListener.TOPIC, SearchListener { state ->
             when (state) {
-                is SearchState.Running -> clearAll()
-                is SearchState.Results -> install(state.results)
+                is SearchState.Running -> searchResultState.tryEmit(emptyList())
+                is SearchState.Results -> searchResultState.tryEmit(state.results)
                 else -> Unit
+            }
+        })
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
+            override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
+                val currentResults = searchResultState.value
+                if (currentResults.isEmpty()) return
+
+                val matchingResults = currentResults.filter { result ->
+                    val expectedPath = "${project.basePath}/${result.relativeFilePath}"
+                    file.path == expectedPath
+                }
+
+                if (matchingResults.isNotEmpty()) {
+                    val editor = (source.getEditors(file).filterIsInstance<TextEditor>().firstOrNull()?.editor) ?: return
+                    matchingResults.forEach { result ->
+                        addNoteInlay(editor, result)
+                    }
+                }
             }
         })
     }
 
     fun clearAll() {
+        searchResultState.value = emptyList()
         inlays.forEach { it.dispose() }
         inlays.clear()
     }
 
     fun install(results: List<SearchResult>) {
         clearAll()
-        val fem = FileEditorManager.getInstance(project)
         for (result in results) {
             val vFile = LocalFileSystem.getInstance()
                 .findFileByPath("${project.basePath}/${result.relativeFilePath}") ?: continue
-            val editor = fem.getEditors(vFile)
-                .filterIsInstance<TextEditor>()
-                .firstOrNull()?.editor ?: continue
-            addNoteInlay(editor, result)
+            addInlayToFile(vFile, result)
         }
+    }
+
+    private fun addInlayToFile(file: VirtualFile, result: SearchResult) {
+        val editor = FileEditorManager.getInstance(project).getEditors(file).filterIsInstance<TextEditor>().firstOrNull()?.editor ?: return
+        addNoteInlay(editor, result)
     }
 
     private fun addNoteInlay(editor: Editor, result: SearchResult) {
