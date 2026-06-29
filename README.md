@@ -126,3 +126,7 @@ The plugin communicates with an external AI tool through a configurable bridge c
 ## License
 
 MIT
+
+## Inspiration
+
+Inspired by the Neovim plugin [ThePrimeagen/99](https://github.com/ThePrimeagen/99).
