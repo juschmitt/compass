@@ -1,10 +1,11 @@
 package de.juschmitt.compass.rewrite.ui
 
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.impl.EditorEmbeddedComponentManager
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import java.awt.FlowLayout
@@ -33,7 +34,11 @@ object InlineDiffPresenter {
         val insertOffset = rangeMarker.endOffset
 
         if (editor !is EditorImpl) {
-            showFallbackDialog(project, originalText, replacementText, onAccept, onReject)
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Compass")
+                .createNotification("Compass: could not display rewrite diff in this editor", NotificationType.ERROR)
+                .notify(project)
+            onReject()
             return
         }
 
@@ -59,7 +64,11 @@ object InlineDiffPresenter {
         )
 
         if (diffInlay == null) {
-            showFallbackDialog(project, originalText, replacementText, onAccept, onReject)
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Compass")
+                .createNotification("Compass: could not display rewrite diff in this editor", NotificationType.ERROR)
+                .notify(project)
+            onReject()
             return
         }
 
@@ -89,7 +98,11 @@ object InlineDiffPresenter {
         if (buttonsInlay == null) {
             diffInlay?.dispose()
             diffInlay = null
-            showFallbackDialog(project, originalText, replacementText, onAccept, onReject)
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Compass")
+                .createNotification("Compass: could not display rewrite diff in this editor", NotificationType.ERROR)
+                .notify(project)
+            onReject()
         }
     }
 
@@ -110,28 +123,4 @@ object InlineDiffPresenter {
             rejectBtn.addActionListener { onReject() }
         }
 
-    private fun showFallbackDialog(
-        project: Project,
-        originalText: String,
-        replacementText: String,
-        onAccept: () -> Unit,
-        onReject: () -> Unit
-    ) {
-        val preview = buildString {
-            appendLine("Original:")
-            appendLine(originalText.take(300) + if (originalText.length > 300) "…" else "")
-            appendLine()
-            appendLine("Replacement:")
-            append(replacementText.take(300) + if (replacementText.length > 300) "…" else "")
-        }
-        val choice = Messages.showYesNoDialog(
-            project,
-            preview,
-            "Accept Rewrite?",
-            "Accept",
-            "Reject",
-            null
-        )
-        if (choice == Messages.YES) onAccept() else onReject()
-    }
 }

@@ -65,22 +65,6 @@ class ThinkingIndicator(
                 .addComponent(editor, endPanel, endProps)?.let { inlays.add(it) }
         }
 
-        if (inlays.isEmpty()) {
-            editor.inlayModel.addBlockElement(
-                startOffset,
-                false,
-                true,
-                10,
-                ThinkingFenceRenderer(editor, "⟳  rewriting…")
-            )?.let { inlays.add(it) }
-            editor.inlayModel.addBlockElement(
-                normalizedEnd,
-                false,
-                false,   // showAbove = false → BELOW the line
-                10,
-                ThinkingFenceRenderer(editor, "⟳  rewriting…")
-            )?.let { inlays.add(it) }
-        }
     }
 
     override fun dispose() {

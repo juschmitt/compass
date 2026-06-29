@@ -1,5 +1,7 @@
 package de.juschmitt.compass.search
 
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
@@ -15,7 +17,6 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
-import de.juschmitt.compass.search.ui.SearchNoteRenderer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.awt.FlowLayout
@@ -88,44 +89,36 @@ class SearchAnnotationService(private val project: Project) : Disposable {
     }
 
     private fun addNoteInlay(editor: Editor, result: SearchResult) {
+        if (editor !is EditorImpl) {
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Compass")
+                .createNotification("Compass: annotation inlay is not supported in this editor type", NotificationType.ERROR)
+                .notify(this.project)
+            return
+        }
+
         val doc = editor.document
         val lineIndex = (result.startLine - 1).coerceIn(0, doc.lineCount - 1)
         val offset = doc.getLineStartOffset(lineIndex)
-        var added = false
 
-        if (editor is EditorImpl) {
-            var selfInlay: Inlay<*>? = null
-            val panel = buildNotePanel(result.note) {
-                selfInlay?.dispose()
-                inlays.remove(selfInlay)
-            }
-            val props = EditorEmbeddedComponentManager.Properties(
-                EditorEmbeddedComponentManager.ResizePolicy.none(),
-                null,
-                false,
-                true,
-                10,
-                offset
-            )
-            EditorEmbeddedComponentManager.getInstance()
-                .addComponent(editor, panel, props)?.let {
-                    selfInlay = it
-                    inlays.add(it)
-                    added = true
-                }
+        var selfInlay: Inlay<*>? = null
+        val panel = buildNotePanel(result.note) {
+            selfInlay?.dispose()
+            inlays.remove(selfInlay)
         }
-
-        if (!added) {
-            var selfInlay: Inlay<*>? = null
-            val renderer = SearchNoteRenderer(editor, result.note) {
-                selfInlay?.dispose()
-                inlays.remove(selfInlay)
-            }
-            editor.inlayModel.addBlockElement(offset, false, true, 10, renderer)?.let {
+        val props = EditorEmbeddedComponentManager.Properties(
+            EditorEmbeddedComponentManager.ResizePolicy.none(),
+            null,
+            false,
+            true,
+            10,
+            offset
+        )
+        EditorEmbeddedComponentManager.getInstance()
+            .addComponent(editor, panel, props)?.let {
                 selfInlay = it
                 inlays.add(it)
             }
-        }
     }
 
     private fun buildNotePanel(note: String, onClear: () -> Unit): JPanel =
