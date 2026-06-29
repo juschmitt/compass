@@ -1,11 +1,15 @@
 <idea-plugin>
     <id>de.juschmitt.compass</id>
     <name>Compass</name>
-    <vendor>de.juschmitt</vendor>
-    <description><![CDATA[
-        AI-assisted coding workflow plugin for JetBrains IDEs.
-        Provides objective-based project search and selection rewrite via a user-configured bridge command.
+    <vendor url="https://github.com/juschmitt/compass">de.juschmitt</vendor>
+    <description><![CDATA[A IntelliJ IDEA plugin that enhances traditional coding with AI.
+    No AI agent mode, no code suggestions/completions, no chat.
+    Set an objective (optional), search for what you want to do, go through the AI-generated list and write the code yourself.
+    Or use selection rewrite to let AI rewrite sections when you want to.
     ]]></description>
+
+    <change-notes><![CDATA[Initial release.]]></change-notes>
+    <idea-version since-build="252"/>
 
     <depends>com.intellij.modules.platform</depends>
 
