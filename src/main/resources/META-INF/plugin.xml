@@ -1,0 +1,64 @@
+<idea-plugin>
+    <id>de.juschmitt.compass</id>
+    <name>Compass</name>
+    <vendor>de.juschmitt</vendor>
+    <description><![CDATA[
+        AI-assisted coding workflow plugin for JetBrains IDEs.
+        Provides objective-based project search and selection rewrite via a user-configured bridge command.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <resource-bundle>messages.WorkflowBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="de.juschmitt.compass.config.WorkflowAppSettings"/>
+
+        <projectConfigurable
+                instance="de.juschmitt.compass.config.WorkflowConfigurable"
+                id="de.juschmitt.compass.settings"
+                displayName="Compass"
+                parentId="tools"/>
+
+        <toolWindow
+                id="Compass"
+                anchor="right"
+                factoryClass="de.juschmitt.compass.search.ui.SearchToolWindowFactory"
+                icon="AllIcons.Actions.Find"/>
+
+        <statusBarWidgetFactory
+                id="de.juschmitt.compass.objective"
+                implementation="de.juschmitt.compass.objective.ObjectiveStatusBarWidgetFactory"
+                order="first"/>
+
+        <notificationGroup id="Compass" displayType="BALLOON" bundle="messages.WorkflowBundle"/>
+        <postStartupActivity implementation="de.juschmitt.compass.search.SearchAnnotationStartup"/>
+    </extensions>
+
+    <actions>
+        <action id="de.juschmitt.compass.SetObjective"
+                class="de.juschmitt.compass.objective.SetObjectiveAction"
+                text="Set Current Objective"
+                description="Set the session objective for Compass">
+            <keyboard-shortcut first-keystroke="ctrl alt O" keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="MainMenu" anchor="last"/>
+        </action>
+        <action id="de.juschmitt.compass.RunSearch"
+                class="de.juschmitt.compass.search.RunSearchAction"
+                text="Run Compass Search"
+                description="Run a Compass search">
+            <keyboard-shortcut first-keystroke="ctrl alt F" keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="MainMenu" anchor="last"/>
+        </action>
+        <action id="de.juschmitt.compass.SelectionRewrite"
+                class="de.juschmitt.compass.rewrite.SelectionRewriteAction"
+                text="Selection Rewrite"
+                description="Rewrite the current selection via Compass">
+            <keyboard-shortcut first-keystroke="ctrl alt R" keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="MainMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
