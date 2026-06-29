@@ -136,6 +136,9 @@ class SearchToolWindowPanel(private val project: Project, parentDisposable: Disp
         when (state) {
             is SearchState.Idle -> {
                 bannerPanel.isVisible = false
+                listModel.clear()
+                promptFooter.text = ""
+                promptFooter.isVisible = false
             }
             is SearchState.Running -> {
                 lastPrompt = state.prompt

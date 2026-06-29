@@ -29,6 +29,9 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
     @Volatile
     private var lastResults: List<SearchResult> = emptyList()
 
+    @Volatile
+    private var lastPrompt: String = ""
+
     private val json = Json { ignoreUnknownKeys = true }
 
     fun runSearch(searchPrompt: String) {
@@ -62,6 +65,7 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
                         try {
                             val response = json.decodeFromString<SearchResponse>(extractJson(result.output))
                             lastResults = response.results
+                            lastPrompt = searchPrompt
                             withContext(Dispatchers.Main) {
                                 project.messageBus.syncPublisher(SearchListener.TOPIC)
                                     .searchStateChanged(SearchState.Results(searchPrompt, response.results))
@@ -93,9 +97,17 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
 
     fun cancelCurrentSearch() {
         cs.launch {
+            val results: List<SearchResult>
+            val prompt: String
             mutex.withLock {
                 currentJob?.cancel()
                 currentJob = null
+                results = lastResults
+                prompt = lastPrompt
+            }
+            withContext(Dispatchers.Main) {
+                val state = if (results.isEmpty()) SearchState.Idle else SearchState.Results(prompt, results)
+                project.messageBus.syncPublisher(SearchListener.TOPIC).searchStateChanged(state)
             }
         }
     }
