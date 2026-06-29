@@ -2,15 +2,16 @@ package de.juschmitt.compass.bridge
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.ProcessOutput
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.juschmitt.compass.config.EffectiveConfig
+import de.juschmitt.compass.config.WorkflowAppSettings
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import java.nio.charset.StandardCharsets
 import kotlin.coroutines.resume
-import kotlin.time.Duration.Companion.milliseconds
-
-private const val BRIDGE_TIMEOUT_MS = 60_000L
+import kotlin.time.Duration.Companion.seconds
 
 class BridgeClient(private val project: Project) {
 
@@ -41,7 +42,9 @@ class BridgeClient(private val project: Project) {
             return BridgeResult.Error("Failed to write to bridge stdin: ${e.message}")
         }
 
-        val processResult = withTimeoutOrNull(BRIDGE_TIMEOUT_MS.milliseconds) {
+        val timeoutSeconds = service<WorkflowAppSettings>().bridgeTimeoutSeconds
+
+        val runBridge: suspend () -> ProcessOutput? = {
             suspendCancellableCoroutine { cont ->
                 cont.invokeOnCancellation { handler.destroyProcess() }
                 Thread {
@@ -51,9 +54,19 @@ class BridgeClient(private val project: Project) {
             }
         }
 
+        val processResult = if (timeoutSeconds > 0) {
+            withTimeoutOrNull(timeoutSeconds.seconds) { runBridge() }
+        } else {
+            runBridge()
+        }
+
         if (processResult == null) {
             handler.destroyProcess()
-            return BridgeResult.Error("Bridge command timed out (60s)")
+            return if (timeoutSeconds > 0) {
+                BridgeResult.Error("Bridge command timed out (${timeoutSeconds}s)")
+            } else {
+                BridgeResult.Error("Bridge command failed unexpectedly")
+            }
         }
 
         if (processResult.exitCode != 0) {

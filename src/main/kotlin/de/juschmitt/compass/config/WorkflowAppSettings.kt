@@ -14,9 +14,14 @@ import com.intellij.openapi.components.Storage
 class WorkflowAppSettings : SimplePersistentStateComponent<WorkflowAppSettings.State>(State()) {
     class State : BaseState() {
         var bridgeCommand: String? by string("")
+        var bridgeTimeoutSeconds: Int by property(120)
     }
 
     var bridgeCommand: String
         get() = state.bridgeCommand ?: ""
         set(value) { state.bridgeCommand = value }
+
+    var bridgeTimeoutSeconds: Int
+        get() = state.bridgeTimeoutSeconds
+        set(value) { state.bridgeTimeoutSeconds = value }
 }
