@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import de.juschmitt.compass.bridge.BridgeClient
@@ -18,6 +19,7 @@ import de.juschmitt.compass.rewrite.ui.ThinkingIndicator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -51,6 +53,11 @@ class RewriteService(private val project: Project, private val cs: CoroutineScop
 
     fun startRewrite(request: RewriteRequest) {
         ApplicationManager.getApplication().assertIsDispatchThread()
+
+        if (request.editor !is EditorImpl) {
+            showError("Rewrite is not supported in this editor type")
+            return
+        }
 
         if (request.selectionRange.isEmpty) {
             showError("Selection is empty — please select text before running Selection Rewrite")
@@ -144,7 +151,7 @@ class RewriteService(private val project: Project, private val cs: CoroutineScop
                     }
                 }
             } catch (e: CancellationException) {
-                withContext(Dispatchers.Main) { release(active) }
+                withContext(NonCancellable + Dispatchers.Main) { release(active) }
                 throw e
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
