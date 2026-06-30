@@ -33,8 +33,8 @@ class ObjectiveStatusBarWidget(private val project: Project) : StatusBarWidget, 
 
     override fun getTooltipText(): String? {
         val obj = currentObjective
-        return if (obj.isNullOrBlank()) "Compass: No objective set. Click to set."
-        else "Compass objective: $obj"
+        return if (obj.isNullOrBlank()) "Bearing: No objective set. Click to set."
+        else "Bearing objective: $obj"
     }
 
     override fun getAlignment() = 0f

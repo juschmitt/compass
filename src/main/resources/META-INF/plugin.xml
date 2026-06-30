@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>de.juschmitt.compass</id>
-    <name>Compass</name>
+    <name>Bearing</name>
     <vendor url="https://github.com/juschmitt/compass">de.juschmitt</vendor>
     <description><![CDATA[A IntelliJ IDEA plugin that enhances traditional coding with AI.
     No AI agent mode, no code suggestions/completions, no chat.
@@ -21,11 +21,11 @@
         <projectConfigurable
                 instance="de.juschmitt.compass.config.WorkflowConfigurable"
                 id="de.juschmitt.compass.settings"
-                displayName="Compass"
+                displayName="Bearing"
                 parentId="tools"/>
 
         <toolWindow
-                id="Compass"
+                id="Bearing"
                 anchor="right"
                 factoryClass="de.juschmitt.compass.search.ui.SearchToolWindowFactory"
                 icon="AllIcons.Actions.Find"/>
@@ -35,7 +35,7 @@
                 implementation="de.juschmitt.compass.objective.ObjectiveStatusBarWidgetFactory"
                 order="first"/>
 
-        <notificationGroup id="Compass" displayType="BALLOON" bundle="messages.WorkflowBundle"/>
+        <notificationGroup id="Bearing" displayType="BALLOON" bundle="messages.WorkflowBundle"/>
         <postStartupActivity implementation="de.juschmitt.compass.search.SearchAnnotationStartup"/>
     </extensions>
 
@@ -43,15 +43,15 @@
         <action id="de.juschmitt.compass.SetObjective"
                 class="de.juschmitt.compass.objective.SetObjectiveAction"
                 text="Set Current Objective"
-                description="Set the session objective for Compass">
+                description="Set the session objective for Bearing">
             <keyboard-shortcut first-keystroke="ctrl alt O" keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="MainMenu" anchor="last"/>
         </action>
         <action id="de.juschmitt.compass.RunSearch"
                 class="de.juschmitt.compass.search.RunSearchAction"
-                text="Run Compass Search"
-                description="Run a Compass search">
+                text="Run Bearing Search"
+                description="Run a Bearing search">
             <keyboard-shortcut first-keystroke="ctrl alt F" keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="MainMenu" anchor="last"/>
@@ -59,7 +59,7 @@
         <action id="de.juschmitt.compass.SelectionRewrite"
                 class="de.juschmitt.compass.rewrite.SelectionRewriteAction"
                 text="Selection Rewrite"
-                description="Rewrite the current selection via Compass">
+                description="Rewrite the current selection via Bearing">
             <keyboard-shortcut first-keystroke="ctrl alt R" keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="MainMenu" anchor="last"/>

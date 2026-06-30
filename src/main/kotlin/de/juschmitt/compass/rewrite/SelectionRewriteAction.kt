@@ -27,7 +27,7 @@ class SelectionRewriteAction : AnAction() {
 
         if (!editor.selectionModel.hasSelection()) {
             com.intellij.notification.NotificationGroupManager.getInstance()
-                .getNotificationGroup("Compass")
+                .getNotificationGroup("Bearing")
                 .createNotification(
                     "Please select text before running Selection Rewrite",
                     com.intellij.notification.NotificationType.WARNING

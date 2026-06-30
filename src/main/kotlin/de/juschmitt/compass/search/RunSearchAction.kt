@@ -20,7 +20,7 @@ class RunSearchAction : AnAction() {
         val prompt = Messages.showInputDialog(
             project,
             "Enter search prompt:",
-            "Run Compass Search",
+            "Run Bearing Search",
             null
         )?.trim() ?: return
 
@@ -29,6 +29,6 @@ class RunSearchAction : AnAction() {
         project.service<SearchService>().runSearch(prompt)
 
         val toolWindowManager = com.intellij.openapi.wm.ToolWindowManager.getInstance(project)
-        toolWindowManager.getToolWindow("Compass")?.show()
+        toolWindowManager.getToolWindow("Bearing")?.show()
     }
 }

@@ -35,8 +35,8 @@ object InlineDiffPresenter {
 
         if (editor !is EditorImpl) {
             NotificationGroupManager.getInstance()
-                .getNotificationGroup("Compass")
-                .createNotification("Compass: could not display rewrite diff in this editor", NotificationType.ERROR)
+                .getNotificationGroup("Bearing")
+                .createNotification("Bearing: could not display rewrite diff in this editor", NotificationType.ERROR)
                 .notify(project)
             onReject()
             return
@@ -65,8 +65,8 @@ object InlineDiffPresenter {
 
         if (diffInlay == null) {
             NotificationGroupManager.getInstance()
-                .getNotificationGroup("Compass")
-                .createNotification("Compass: could not display rewrite diff in this editor", NotificationType.ERROR)
+                .getNotificationGroup("Bearing")
+                .createNotification("Bearing: could not display rewrite diff in this editor", NotificationType.ERROR)
                 .notify(project)
             onReject()
             return
@@ -99,8 +99,8 @@ object InlineDiffPresenter {
             diffInlay?.dispose()
             diffInlay = null
             NotificationGroupManager.getInstance()
-                .getNotificationGroup("Compass")
-                .createNotification("Compass: could not display rewrite diff in this editor", NotificationType.ERROR)
+                .getNotificationGroup("Bearing")
+                .createNotification("Bearing: could not display rewrite diff in this editor", NotificationType.ERROR)
                 .notify(project)
             onReject()
         }

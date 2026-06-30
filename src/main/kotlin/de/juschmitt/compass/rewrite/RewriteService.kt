@@ -168,7 +168,7 @@ class RewriteService(private val project: Project, private val cs: CoroutineScop
             showError("Cannot apply: the file region has changed")
             return
         }
-        WriteCommandAction.runWriteCommandAction(project, "Compass Rewrite", null, {
+        WriteCommandAction.runWriteCommandAction(project, "Bearing Rewrite", null, {
             request.editor.document.replaceString(
                 rangeMarker.startOffset,
                 rangeMarker.endOffset,
@@ -180,7 +180,7 @@ class RewriteService(private val project: Project, private val cs: CoroutineScop
     private fun showError(message: String) {
         ApplicationManager.getApplication().invokeLater {
             NotificationGroupManager.getInstance()
-                .getNotificationGroup("Compass")
+                .getNotificationGroup("Bearing")
                 .createNotification(message, NotificationType.ERROR)
                 .notify(project)
         }

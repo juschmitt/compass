@@ -91,8 +91,8 @@ class SearchAnnotationService(private val project: Project) : Disposable {
     private fun addNoteInlay(editor: Editor, result: SearchResult) {
         if (editor !is EditorImpl) {
             NotificationGroupManager.getInstance()
-                .getNotificationGroup("Compass")
-                .createNotification("Compass: annotation inlay is not supported in this editor type", NotificationType.ERROR)
+                .getNotificationGroup("Bearing")
+                .createNotification("Bearing: annotation inlay is not supported in this editor type", NotificationType.ERROR)
                 .notify(this.project)
             return
         }

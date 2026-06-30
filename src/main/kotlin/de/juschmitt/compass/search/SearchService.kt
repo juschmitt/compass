@@ -114,7 +114,7 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
 
     private fun showError(message: String) {
         NotificationGroupManager.getInstance()
-            .getNotificationGroup("Compass")
+            .getNotificationGroup("Bearing")
             .createNotification(message, NotificationType.ERROR)
             .notify(project)
     }

@@ -8,7 +8,7 @@ class WorkflowConfigurable(private val project: Project) : Configurable {
 
     private var panel: WorkflowConfigPanel? = null
 
-    override fun getDisplayName() = "Compass"
+    override fun getDisplayName() = "Bearing"
 
     override fun createComponent(): JComponent {
         val p = WorkflowConfigPanel(project)
