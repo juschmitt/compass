@@ -26,7 +26,7 @@ class SetObjectiveAction : AnAction() {
             null,
             current,
             null
-        ) ?: return // user cancelled
+        ) ?: return
 
         objectiveService.setObjective(result)
     }

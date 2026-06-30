@@ -6,10 +6,6 @@ import org.junit.Test
 
 class PromptBuilderTest {
 
-    // -------------------------------------------------------------------------
-    // buildSearch
-    // -------------------------------------------------------------------------
-
     @Test
     fun test_buildSearch_withObjective_containsSearchPromptAndObjectiveText() {
         val result = PromptBuilder.buildSearch(
@@ -59,10 +55,6 @@ class PromptBuilderTest {
         val result = PromptBuilder.buildSearch(searchPrompt = "find something", objective = null)
         assertTrue(result.contains("up to 10"))
     }
-
-    // -------------------------------------------------------------------------
-    // buildRewrite
-    // -------------------------------------------------------------------------
 
     @Test
     fun test_buildRewrite_selectionTextAppearsInResult() {

@@ -42,8 +42,6 @@ object InlineDiffPresenter {
             return
         }
 
-        // Shared holders — both vars are captured by reference in the lambdas below,
-        // so they will be populated by the time a button is actually clicked.
         var diffInlay: com.intellij.openapi.editor.Inlay<*>? = null
         var buttonsInlay: com.intellij.openapi.editor.Inlay<*>? = null
 
@@ -57,9 +55,9 @@ object InlineDiffPresenter {
         val renderer = InlineDiffRenderer(editor, originalLines, replacementLines)
         diffInlay = editor.inlayModel.addBlockElement(
             insertOffset,
-            true,  // relatesToPrecedingText
-            false, // showAbove
-            1,     // priority
+            true,
+            false,
+            1,
             renderer
         )
 

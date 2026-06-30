@@ -57,7 +57,7 @@ class ThinkingIndicator(
                 EditorEmbeddedComponentManager.ResizePolicy.none(),
                 null,
                 false,
-                false,   // showAbove = false → BELOW the line
+                false,
                 10,
                 normalizedEnd
             )

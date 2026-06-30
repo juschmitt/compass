@@ -36,7 +36,6 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
 
     fun runSearch(searchPrompt: String) {
         cs.launch {
-            // Cancel the previous job before starting a new one
             mutex.withLock {
                 currentJob?.cancel()
                 currentJob = null
@@ -85,7 +84,7 @@ class SearchService(private val project: Project, private val cs: CoroutineScope
                             showError("Search failed: ${result.message}")
                         }
                     }
-                    BridgeResult.Cancelled -> { /* silently dropped */ }
+                    BridgeResult.Cancelled -> {}
                 }
             }
 
